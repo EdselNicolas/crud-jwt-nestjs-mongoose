@@ -9,4 +9,6 @@ export const ItemSchema = new mongoose.Schema({
     type: Number,
     required: true,
   },
-});
+}, {
+    versionKey: false,
+  });
