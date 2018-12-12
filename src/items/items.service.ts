@@ -10,6 +10,10 @@ export class ItemsService {
     return await this.itemModel.find().exec();
   }
 
+  async findOne(id: string): Promise<Item[]> {
+    return await this.itemModel.findById(id);
+  }
+
   async create(createItemDto: CreateItemDto): Promise<Item> {
     const createdItem = new this.itemModel(createItemDto);
     return await createdItem.save();
