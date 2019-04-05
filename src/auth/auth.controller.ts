@@ -1,6 +1,6 @@
 import { LoginUserDto } from './../users/login-user.dto';
 import { JwtPayload } from './jwt-payload.interface';
-import { Controller, Get, UseGuards, Post, Body, Response, Inject, HttpStatus } from '@nestjs/common';
+import { Controller, Get, UseGuards, Post, Body, Response, Inject, HttpStatus, HttpException } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { AuthService } from './auth.service';
 import { UsersService } from 'src/users/users.service';
@@ -16,7 +16,10 @@ export class AuthController {
             if (await this.usersService.compareHash(payload.password, user['password'])) {
                 return await this.authService.createToken(payload);
             } else {
-                return user;
+                throw new HttpException({
+                    status: HttpStatus.UNAUTHORIZED,
+                    error: 'Wrong username or password',
+                }, HttpStatus.UNAUTHORIZED);
             }
         }
     }

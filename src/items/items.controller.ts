@@ -9,6 +9,7 @@ import {
   Param,
   Put,
   UseGuards,
+  HttpStatus,
 } from '@nestjs/common';
 import { CreateItemDto } from './create-item.dto';
 import { ItemsService } from './items.service';
@@ -36,17 +37,20 @@ export class ItemsController {
   @UsePipes(new ValidationPipe())
   async create(@Body() createItemDto: CreateItemDto) {
     this.itemsService.create(createItemDto);
+    return { status: HttpStatus.CREATED };
   }
 
   @Delete(':id')
   @UseGuards(AuthGuard('jwt'))
   async deleteItem(@Param('id') id) {
     this.itemsService.delete(id);
+    return { status: HttpStatus.OK };
   }
 
   @Put(':id')
   @UseGuards(AuthGuard('jwt'))
   async updateItem(@Param('id') id, @Body() createItemDto: CreateItemDto) {
-    this.itemsService.updateItem(id, createItemDto);
+    await this.itemsService.updateItem(id, createItemDto);
+    return { status: HttpStatus.OK };
   }
 }

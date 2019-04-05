@@ -9,6 +9,8 @@ import {
     Param,
     Put,
     UseGuards,
+    HttpStatus,
+    HttpException,
 } from '@nestjs/common';
 import { CreateUserDto } from './create-user.dto';
 import { UsersService } from './users.service';
@@ -33,15 +35,26 @@ export class UsersController {
     }
 
     @Post()
+    @UseGuards(AuthGuard('jwt'))
     // @UsePipes(new ValidationPipe())
     async create(@Body() createUserDto: CreateUserDto) {
-        this.usersService.create(createUserDto);
+        const duplicateUser = await this.usersService.findOne(createUserDto);
+        if (!duplicateUser) {
+            this.usersService.create(createUserDto);
+            return { status: HttpStatus.CREATED };
+        } else {
+            throw new HttpException({
+                status: HttpStatus.CONFLICT,
+                error: 'Username already taken',
+            }, HttpStatus.CONFLICT);
+        }
     }
 
     @Delete(':id')
     @UseGuards(AuthGuard('jwt'))
     async deleteItem(@Param('id') id) {
         this.usersService.delete(id);
+        return { status: HttpStatus.OK };
     }
 
     // @Put(':id')
